@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -Wall #-}
+{-# OPTIONS_GHC -Wno-unused-matches #-}
 -- Note: the above pragma enables all warnings
 
 module Task3 where
@@ -17,5 +18,5 @@ type Move = (Peg, Peg)
 -- [("a","c"),("a","b"),("c","b")]
 
 hanoi :: Int -> Peg -> Peg -> Peg -> [Move]
-hanoi = error "TODO: define hanoi"
-
+hanoi 1 l r tmp = [(l, r)]
+hanoi n l r tmp =  hanoi (n-1) l tmp r ++ [(l, r)] ++ hanoi (n-1) tmp r l

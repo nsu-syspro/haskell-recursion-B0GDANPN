@@ -6,7 +6,6 @@ module Task1 where
 -- Explicit import of Prelude to hide functions
 -- that are not supposed to be used in this assignment
 import Prelude hiding (reverse, map, filter, sum, foldl, foldr, length, head, tail, init, last, show, read)
-
 -----------------------------------
 --
 -- Checks whether the last digit is a valid check digit
@@ -22,8 +21,7 @@ import Prelude hiding (reverse, map, filter, sum, foldl, foldr, length, head, ta
 -- False
 
 validate :: Integer -> Bool
-validate = error "TODO: define validate"
-
+validate n = luhn (toDigits (n `div` 10)) == fromInteger (n `mod` 10)
 -----------------------------------
 --
 -- Computes check digit for given digits using Luhn algorithm
@@ -32,10 +30,10 @@ validate = error "TODO: define validate"
 --
 -- >>> luhn [3,4,5,6]
 -- 1
-
 luhn :: [Int] -> Int
-luhn = error "TODO: define luhn"
-
+luhn n = innerFunc (sum (map normalize (doubleEveryOther (reverse n))))
+  where
+    innerFunc s = (10 - (s `mod` 10)) `mod` 10
 -----------------------------------
 --
 -- Produces list of digits for given positive number;
@@ -51,8 +49,10 @@ luhn = error "TODO: define luhn"
 -- []
 
 toDigits :: Integer -> [Int]
-toDigits = error "TODO: define toDigits"
-
+toDigits 0 = []
+toDigits n 
+  | n < 0 = []
+  | otherwise = toDigits (n `div` 10) ++ [fromInteger (n `mod` 10)]
 -----------------------------------
 --
 -- Produces list in reverse order to the given one
@@ -65,8 +65,8 @@ toDigits = error "TODO: define toDigits"
 -- [6,5,4,3]
 
 reverse :: [a] -> [a]
-reverse = error "TODO: define reverse"
-
+reverse []       = []
+reverse (n : xs) =  reverse xs ++ [n]
 -----------------------------------
 --
 -- Doubles every other digit starting from first one
@@ -77,7 +77,9 @@ reverse = error "TODO: define reverse"
 -- [12,5,8,3]
 
 doubleEveryOther :: [Int] -> [Int]
-doubleEveryOther = error "TODO: define doubleEveryOther"
+doubleEveryOther [] = []
+doubleEveryOther [n] = [2 * n]
+doubleEveryOther (n1:n2:xs) = 2 * n1 : n2 :doubleEveryOther xs
 
 -----------------------------------
 --
@@ -94,7 +96,10 @@ doubleEveryOther = error "TODO: define doubleEveryOther"
 -- 1
 
 normalize :: Int -> Int
-normalize = error "TODO: define normalize"
+normalize n
+  | n>9 = n - 9
+  | otherwise = n
+
 
 -----------------------------------
 --
@@ -103,11 +108,13 @@ normalize = error "TODO: define normalize"
 --
 -- Usage example:
 --
--- >>> map (\x -> x * 2) [1,2,3,4]
+-- >>> map (\n -> n * 2) [1,2,3,4]
 -- [2,4,6,8]
-
+--
 map :: (a -> b) -> [a] -> [b]
-map = error "TODO: define map"
+map _ []     = []
+map f (n:xs) = f n : map f xs
+
 
 -----------------------------------
 --
@@ -119,6 +126,6 @@ map = error "TODO: define map"
 -- 19
 -- >>> sum []
 -- 0
-
 sum :: [Int] -> Int
-sum = error "TODO: define sum"
+sum []     = 0
+sum (n:xs) = n + sum xs
