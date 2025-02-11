@@ -12,7 +12,7 @@ import Prelude hiding (reverse, map, filter, sum, foldl, foldr, length, head, ta
 -- You can reuse already implemented functions from Task1
 -- by listing them in this import clause
 -- NOTE: only listed functions are imported, everything else remains hidden
-import Task1 (reverse, map, sum)
+import Task1 (reverse, map, sum,doubleEveryOther, toDigits)
 
 -----------------------------------
 --
@@ -25,7 +25,12 @@ import Task1 (reverse, map, sum)
 -- 1
 
 luhnModN :: Int -> (a -> Int) -> [a] -> Int
-luhnModN = error "TODO: define luhnModN"
+luhnModN n toInt xs = (n - (s `mod` n)) `mod` n
+  where
+    nums = map toInt xs
+    doubled = doubleEveryOther (reverse nums)
+    normalized = map (\x -> if x >= n then x - (n - 1) else x) doubled
+    s = sum normalized
 
 -----------------------------------
 --
@@ -37,7 +42,7 @@ luhnModN = error "TODO: define luhnModN"
 -- 1
 
 luhnDec :: [Int] -> Int
-luhnDec = error "TODO: define luhnDec"
+luhnDec = luhnModN 10 id
 
 -----------------------------------
 --
@@ -49,7 +54,7 @@ luhnDec = error "TODO: define luhnDec"
 -- 15
 
 luhnHex :: [Char] -> Int
-luhnHex = error "TODO: define luhnHex"
+luhnHex = luhnModN 16 digitToInt
 
 -----------------------------------
 --
@@ -65,8 +70,11 @@ luhnHex = error "TODO: define luhnHex"
 -- [10,11,12,13,14,15]
 
 digitToInt :: Char -> Int
-digitToInt = error "TODO: define digitToInt"
-
+digitToInt c
+  | c >= '0' && c <= '9' = fromEnum c - fromEnum '0'
+  | c >= 'a' && c <= 'f' = fromEnum c - fromEnum 'a' + 10
+  | c >= 'A' && c <= 'F' = fromEnum c - fromEnum 'A' + 10
+  | otherwise = error "Invalid hexadecimal digit"
 -----------------------------------
 --
 -- Checks whether the last decimal digit is a valid check digit
@@ -82,7 +90,7 @@ digitToInt = error "TODO: define digitToInt"
 -- False
 
 validateDec :: Integer -> Bool
-validateDec = error "TODO: define validateDec"
+validateDec n = luhnDec (toDigits (n `div` 10)) == fromInteger (n `mod` 10)
 
 -----------------------------------
 --
@@ -99,4 +107,13 @@ validateDec = error "TODO: define validateDec"
 -- False
 
 validateHex :: [Char] -> Bool
-validateHex = error "TODO: define validateHex"
+validateHex s = luhnHex (init s) == digitToInt (last s)
+init :: [a] -> [a]
+init [] = []
+init [_] = []
+init (x : xs) = x : init xs
+
+last :: [a] -> a
+last [] = error "Invalid empty list"
+last [x] = x
+last (_ : xs) = last xs
